@@ -27,38 +27,37 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 val buttonList = listOf(
-    "C","(",")","/",
-    "7","8","9", "*",
-    "4","5","6","+",
-    "1","2","3","-",
-    "AC","0",".","="
-
+    "C", "(", ")", "/",
+    "7", "8", "9", "*",
+    "4", "5", "6", "+",
+    "1", "2", "3", "-",
+    "AC", "0", ".", "="
 )
 
 @Composable
 fun Calculator(modifier: Modifier = Modifier, viewModel: CalculatorViewModel) {
 
     val equationText = viewModel.equationText.observeAsState()
-    val resultText = viewModel.equationText.observeAsState()
+    val resultText = viewModel.resultText.observeAsState()
 
-
-    Box (modifier = modifier) {
-        Column (
-            modifier=modifier.fillMaxSize(),
+    Box(modifier = modifier) {
+        Column(
+            modifier = modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End
         ) {
             Text(
-                text = equationText.value?:"",
+                text = equationText.value ?: "",
                 style = TextStyle(
                     fontSize = 30.sp,
                     textAlign = TextAlign.End
-            ),
+                ),
                 maxLines = 5,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.weight(1f))
 
-            Text(text = resultText.value?:"",
+            Text(
+                text = resultText.value ?: "",
                 style = TextStyle(
                     fontSize = 60.sp,
                     textAlign = TextAlign.End
@@ -68,13 +67,15 @@ fun Calculator(modifier: Modifier = Modifier, viewModel: CalculatorViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // Using a loop to display buttons dynamically in the grid
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 4),
             ) {
-                items(buttonList){
-                    CalculatorButton(btn = it, onClick = {
-                        viewModel.onButtonClick(it)
-                    } )
+                items(buttonList.size) { index ->
+                    val button = buttonList[index]
+                    CalculatorButton(btn = button, onClick = {
+                        viewModel.onButtonClick(button)
+                    })
                 }
             }
         }
@@ -82,7 +83,7 @@ fun Calculator(modifier: Modifier = Modifier, viewModel: CalculatorViewModel) {
 }
 
 @Composable
-fun CalculatorButton(btn : String, onClick : ()-> Unit) {
+fun CalculatorButton(btn: String, onClick: () -> Unit) {
     Box(modifier = Modifier.padding(10.dp)) {
         FloatingActionButton(
             onClick = onClick,
@@ -90,21 +91,17 @@ fun CalculatorButton(btn : String, onClick : ()-> Unit) {
             shape = CircleShape,
             contentColor = Color.White,
             containerColor = getColor(btn)
-
         ) {
             Text(text = btn, fontSize = 23.sp, fontWeight = FontWeight.Bold)
         }
-
     }
 }
 
-
-fun getColor(btn:String) : Color {
-    if(btn == "C" || btn == "AC")
-        return Color(0xFFF44336)
-    if(btn == "(" || btn == ")")
-        return Color.Gray
-    if (btn == "/" || btn == "*" || btn == "+" || btn == "-" || btn == "=")
-        return Color(0xFFFF9800)
-    return Color(0xFF00C8C9)
+fun getColor(btn: String): Color {
+    return when (btn) {
+        "C", "AC" -> Color(0xFFF44336)
+        "(", ")" -> Color.Gray
+        "/", "*", "+", "-", "=" -> Color(0xFFFF9800)
+        else -> Color(0xFF00C8C9)
+    }
 }

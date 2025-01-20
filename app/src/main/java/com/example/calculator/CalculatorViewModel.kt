@@ -19,6 +19,13 @@ class CalculatorViewModel : ViewModel(){
         Log.i("Clicked Button", btn)
 
         _equationText.value?.let {
+            when (btn) {
+                "." -> {
+                    _equationText.value = ""
+                    _resultText.value = "0"
+                }
+            }
+
             if (btn=="AC"){
                 _equationText.value = ""
                 _resultText.value = "0"
