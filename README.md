@@ -9,7 +9,7 @@ The purpose of this software is to learn the basics of Kotlin language using Var
 Loops, Functions, clases and the when keyword 
 
 
-[Software Demo Video](https://youtu.be/2AT7UrlL5X8)
+[Software Demo Video](https://ooo.mmhmm.app/watch/y_5ejnwdnAKpG7iCtLbvnc)
 
 # Development Environment
 
