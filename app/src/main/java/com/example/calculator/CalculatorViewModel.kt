@@ -7,63 +7,89 @@ import androidx.lifecycle.ViewModel
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.Scriptable
 
-class CalculatorViewModel : ViewModel(){
+// ViewModel class responsible for managing UI-related data and business logic for the Calculator
+class CalculatorViewModel : ViewModel() {
 
+    // MutableLiveData is used to store and update the equation text
     private val _equationText = MutableLiveData("")
-    val equationText : LiveData<String> = _equationText
+    // Public LiveData to expose the equation text, only allowing read access outside of the ViewModel
+    val equationText: LiveData<String> = _equationText
 
-    private val _resultText =MutableLiveData("0")
-    val resultText : LiveData<String> = _resultText
+    // MutableLiveData for storing and updating the result text of the equation
+    private val _resultText = MutableLiveData("0")
+    // Public LiveData to expose the result text, only allowing read access outside of the ViewModel
+    val resultText: LiveData<String> = _resultText
 
-    fun onButtonClick(btn : String){
+    // Function that is called when a button is clicked in the UI
+    fun onButtonClick(btn: String) {
+        // Log the clicked button for debugging purposes
         Log.i("Clicked Button", btn)
 
+        // Check the current value of the equationText and process the button click accordingly
         _equationText.value?.let {
+            // Handling special cases for certain buttons
             when (btn) {
                 "." -> {
+                    // Clear the equation and reset the result when the dot button is clicked
                     _equationText.value = ""
                     _resultText.value = "0"
                 }
             }
 
-            if (btn=="AC"){
+            // Clear the equation and reset result when the "AC" button is clicked
+            if (btn == "AC") {
                 _equationText.value = ""
                 _resultText.value = "0"
                 return
             }
 
-            if (btn == "C"){
-                if(it.isNotEmpty()){
-                    _equationText.value = it.substring(0,it.length-1)
+            // If the "C" button is clicked, remove the last character from the equation text
+            if (btn == "C") {
+                if (it.isNotEmpty()) {
+                    _equationText.value = it.substring(0, it.length - 1)
                 }
                 return
             }
-            if(btn == "=") {
+
+            // If the "=" button is clicked, set the equation text to the result
+            if (btn == "=") {
                 _equationText.value = _resultText.value
                 return
             }
 
-            _equationText.value = it+btn
+            // If it's any other button, append the button's value to the equation text
+            _equationText.value = it + btn
 
-            try{
-               _resultText.value = calculateResult(_equationText.value.toString())
-            }catch (_ : Exception){}
+            // Try to calculate the result of the equation and update the result text
+            try {
+                _resultText.value = calculateResult(_equationText.value.toString())
+            } catch (_: Exception) {
+                // If there is an error during calculation, just ignore it (prevent crash)
+            }
 
-            Log.i("Equation",_equationText.value.toString())
-
+            // Log the current equation for debugging purposes
+            Log.i("Equation", _equationText.value.toString())
         }
-
     }
 
-    fun calculateResult(equation : String) : String{
-        val context : Context = Context.enter()
+    // Function to calculate the result of the equation string using JavaScript's evaluation engine
+    fun calculateResult(equation: String): String {
+        // Enter the JavaScript context using Rhino (a JavaScript runtime)
+        val context: Context = Context.enter()
+        // Disable optimization to make sure the JavaScript engine works correctly in our context
         context.optimizationLevel = -1
-        val scriptable : Scriptable = context.initStandardObjects()
-        var finalResult = context.evaluateString(scriptable,equation, "JavaScript", 1, null).toString()
-        if(finalResult.endsWith(".0")){
+        // Initialize a standard JavaScript environment
+        val scriptable: Scriptable = context.initStandardObjects()
+
+        // Evaluate the string equation using the JavaScript engine
+        var finalResult = context.evaluateString(scriptable, equation, "JavaScript", 1, null).toString()
+
+        // If the result ends with ".0" (indicating it's a whole number), remove the decimal part
+        if (finalResult.endsWith(".0")) {
             finalResult = finalResult.replace(".0", "")
         }
+
+        // Return the result as a string
         return finalResult
     }
-
 }
